@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     public float speed;
     public float jumpForce;
     private float moveInput;
+    private float playerMove;
+    //private bool jump;
 
     private Rigidbody2D rb;
 
@@ -19,7 +21,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundMask;
 
     // Animation
-    public Animator jump;
+    public Animator animator;
 
     // MaybeDouble Jump
     //private int jumps;
@@ -34,19 +36,16 @@ public class PlayerController : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
 
-        jump = rb.GetComponent<Animator>();
-
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Option 1
+        // Option 1 (Jump)
         if (isGrounded)
         {
             if (Input.GetMouseButtonDown(0))
             {
-                //jump.Play("Jump1");
                 rb.velocity = Vector2.up * jumpForce;
             }
         }
@@ -68,18 +67,31 @@ public class PlayerController : MonoBehaviour
         //    rb.velocity = Vector2.up * jumpForce;
         //}
 
-        Debug.Log(isGrounded);
+        // Debug.Log(isGrounded);
 
     }
 
     void FixedUpdate()
     {
-        //// is Player on ground
+        // Is Player on ground
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundMask);
 
         moveInput = Input.GetAxis("Horizontal");
-        rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
+        playerMove = moveInput * speed;
+        rb.velocity = new Vector2(playerMove, rb.velocity.y);
 
+        // Animation
+        if (isGrounded)
+        {
+            animator.SetFloat("Move", Mathf.Abs(playerMove));
+            animator.SetBool("isJumping", false);
+        }
+        else
+        {
+            animator.SetBool("isJumping", true);
+        }
+        
+        // Faceing Direction
         if (isFaceingRight == false && moveInput > 0)
         {
             Flip();
