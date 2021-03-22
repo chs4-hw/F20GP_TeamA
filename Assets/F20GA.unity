@@ -236,7 +236,7 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 256
-  jump: {fileID: 1023553448}
+  animator: {fileID: 1023553448}
 --- !u!95 &1023553448
 Animator:
   serializedVersion: 3
@@ -247,7 +247,7 @@ Animator:
   m_GameObject: {fileID: 1023553446}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: dc689dcf0f2a62244b231798e30405c2, type: 2}
+  m_Controller: {fileID: 9100000, guid: a982ff45e5649684ab5a2849a1f6736d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
