@@ -19,6 +19,8 @@ public class CharacterController2D : MonoBehaviour
 	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 	private Vector3 m_Velocity = Vector3.zero;
 	private bool canDoubleJump = false;
+	private bool onWall = false;
+	private int wallJumpCounter = 0;
 
 	[Header("Events")]
 	[Space]
@@ -62,6 +64,18 @@ public class CharacterController2D : MonoBehaviour
 				if (!wasGrounded)
 					OnLandEvent.Invoke();
 			}
+		}
+
+		Physics2D.queriesStartInColliders = false;
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.right * transform.localScale.x, 2.0f);
+		if (hit.collider != null)
+		{
+			//Hit something, print the tag of the object
+			onWall = true;
+		}
+		else
+		{
+			onWall = false;
 		}
 	}
 
@@ -128,21 +142,47 @@ public class CharacterController2D : MonoBehaviour
 				Flip();
 			}
 		}
-		if (!m_Grounded && jump && canDoubleJump)
+
+
+		
+
+		if (!m_Grounded && jump)
 		{
-			// Add a vertical force to the player.
-			m_Grounded = false;
-			m_Rigidbody2D.velocity = Vector2.up * m_JumpForce;
-			canDoubleJump = false;
+			if (canDoubleJump)
+			{
+				// Add a vertical force to the player and set them to be not on the ground.
+				m_Grounded = false;
+				m_Rigidbody2D.velocity = Vector2.up * m_JumpForce;
+
+				
+				canDoubleJump = false;
+			}
+			if (onWall && wallJumpCounter != 5) {
+				float x = 2.0f;
+				if (m_FacingRight)
+				{
+					x = -2.0f;
+				}
+				else {
+					x = 2.0f;
+				}
+				m_Rigidbody2D.velocity = new Vector2(x, 1f) * m_JumpForce;
+				wallJumpCounter += 1;
+				Flip();
+			}
+
 		}
 		// If the player should jump...
 		if (m_Grounded && jump)
 		{
+			//reset wall jump
+			wallJumpCounter = 0;
 			// Add a vertical force to the player.
 			m_Grounded = false;
 			m_Rigidbody2D.velocity = Vector2.up * m_JumpForce;
 			canDoubleJump = true;
 		}
+
 	}
 
 
