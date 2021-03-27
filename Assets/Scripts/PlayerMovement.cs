@@ -14,6 +14,9 @@ public class PlayerMovement : MonoBehaviour
     private const string isJumping = "isJumping";
     private const string moveSpeed = "Move";
 
+    Transform playerTransform;
+    public float minY = -150;
+
     // Update is called once per frame
     void Update()
     {
@@ -21,7 +24,15 @@ public class PlayerMovement : MonoBehaviour
 
         animator.SetFloat(moveSpeed, Mathf.Abs(horizontalMove));
 
-        if(Input.GetButtonDown("Jump")) {
+        // Use PlayerManager Instance to get current postion if falls below -150 > endgame
+        playerTransform = PlayerManager.instance.player.transform;
+
+        if (playerTransform.position.y <= minY)
+        {
+            FindObjectOfType<GameManager>().EndGame();
+        }
+
+        if (Input.GetButtonDown("Jump")) {
             jump = true;
             animator.SetBool(isJumping, true);
         }
