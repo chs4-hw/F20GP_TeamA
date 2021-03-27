@@ -4,10 +4,12 @@ public class PlayerMovement : MonoBehaviour
 {
     public CharacterController2D controller;
     public Animator animator;
+    public JetpackFuel jetpackFuel;
     public float runSpeed = 40f;
 
     private float horizontalMove = 0f;
     private bool jump = false;
+    private bool usingJetpack = false;
 
     private const string isJumping = "isJumping";
     private const string moveSpeed = "Move";
@@ -23,11 +25,19 @@ public class PlayerMovement : MonoBehaviour
             jump = true;
             animator.SetBool(isJumping, true);
         }
+
+        if(Input.GetKey(KeyCode.Mouse1)) {
+            if(jetpackFuel.Fuel > 0) {
+                usingJetpack = true;
+                animator.SetBool(isJumping, true);
+            }
+        }
     }
 
     void FixedUpdate() {
-        controller.Move(horizontalMove * Time.fixedDeltaTime, false, jump);
+        controller.Move(horizontalMove * Time.fixedDeltaTime, false, jump, usingJetpack);
         jump = false;
+        usingJetpack = false;
     }
 
     public void OnLanding() {

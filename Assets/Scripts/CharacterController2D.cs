@@ -12,12 +12,18 @@ public class CharacterController2D : MonoBehaviour
 	[SerializeField] private Transform m_CeilingCheck;							// A position marking where to check for ceilings
 	[SerializeField] private Collider2D m_CrouchDisableCollider;				// A collider that will be disabled when crouching
 
+	[SerializeField] private GameObject singleJump;
+	[SerializeField] private GameObject doubleJump;
+	[SerializeField] private Transform scrollingBackground;
+
 	const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
 	private bool m_Grounded;            // Whether or not the player is grounded.
 	const float k_CeilingRadius = .2f; // Radius of the overlap circle to determine if the player can stand up
 	private Rigidbody2D m_Rigidbody2D;
 	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 	private Vector3 m_Velocity = Vector3.zero;
+	private bool canJump = false;
+	private bool canDoubleJump = false;
 
 	[Header("Events")]
 	[Space]
@@ -30,8 +36,6 @@ public class CharacterController2D : MonoBehaviour
 	public BoolEvent OnCrouchEvent;
 	private bool m_wasCrouching = false;
 
-	private Transform transBackground;
-
 	private void Awake()
 	{
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
@@ -41,9 +45,23 @@ public class CharacterController2D : MonoBehaviour
 
 		if (OnCrouchEvent == null)
 			OnCrouchEvent = new BoolEvent();
-
-		transBackground = GameObject.Find("BackgroundImage").GetComponent<Transform>();
 	}
+
+    void Update() {
+        if(canJump) {
+            singleJump.transform.localScale = new Vector3(1,1,1);
+        }
+        else {
+            singleJump.transform.localScale = new Vector3(0,0,0);
+        }
+
+        if(canDoubleJump) {
+            doubleJump.transform.localScale = new Vector3(1, 1, 1);
+        }
+        else {
+            doubleJump.transform.localScale = new Vector3(0, 0, 0);
+        }
+    }
 
 	private void FixedUpdate()
 	{
@@ -62,10 +80,15 @@ public class CharacterController2D : MonoBehaviour
 					OnLandEvent.Invoke();
 			}
 		}
+
+        if(m_Grounded) {
+			canJump = true;
+			canDoubleJump = true;
+        }
 	}
 
 
-	public void Move(float move, bool crouch, bool jump)
+	public void Move(float move, bool crouch, bool jump, bool usingJetpack)
 	{
 		// If crouching, check to see if the character can stand up
 		if (!crouch)
@@ -127,13 +150,43 @@ public class CharacterController2D : MonoBehaviour
 				Flip();
 			}
 		}
-		// If the player should jump...
-		if (m_Grounded && jump)
-		{
+
+		// Jetpack-ing.
+		if(usingJetpack) {
+			m_Grounded = false;
+			canJump = false;
+			canDoubleJump = false;
+
+			float yNewVelocity = m_Rigidbody2D.velocity.y;
+			// Jetpack only provides a maximum upwards velocity of half a jump's worth.
+			float maxJetpackVelocity = m_JumpForce * 0.5f;
+
+			// If already going upwards faster than jetpack boost allows.
+			if(yNewVelocity > maxJetpackVelocity) {
+				// Then do nothing.
+            }
+            else {
+				// Add jetpack velocity boost, up to maximum jetpack boost.
+				yNewVelocity = Mathf.Min(yNewVelocity + maxJetpackVelocity, maxJetpackVelocity);
+            }
+
+			Vector3 targetVelocity = new Vector2(m_Rigidbody2D.velocity.x, yNewVelocity);
+			// And then smoothing it out and applying it to the character
+			m_Rigidbody2D.velocity = Vector3.SmoothDamp(m_Rigidbody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
+        }
+		// Jumping.
+		else if (jump && canJump) {
 			// Add a vertical force to the player.
 			m_Grounded = false;
-			m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+			m_Rigidbody2D.velocity = Vector2.up * m_JumpForce;
+			canJump = false;
 		}
+		else if(jump && canDoubleJump) {
+            // Add a vertical force to the player.
+            m_Grounded = false;
+            m_Rigidbody2D.velocity = Vector2.up * m_JumpForce;
+            canDoubleJump = false;
+        }
 	}
 
 
@@ -148,9 +201,9 @@ public class CharacterController2D : MonoBehaviour
 		transform.localScale = theScale;
 
         // Ensure background doesn't flip.
-        theScale = transBackground.localScale;
+        theScale = scrollingBackground.localScale;
 		theScale.x *= -1;
-		transBackground.localScale = theScale;
+		scrollingBackground.localScale = theScale;
 
     }
 }
