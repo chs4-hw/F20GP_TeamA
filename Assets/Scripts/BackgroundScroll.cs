@@ -16,7 +16,10 @@ public class BackgroundScroll : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-        newOffset = new Vector2((float)playerTransform.position.x / divisor, 0f);
+        float x = playerTransform.position.x / divisor;
+        float y = playerTransform.position.y / divisor;
+        newOffset = new Vector2(x,y);
+        //newOffset = new Vector2((float)playerTransform.position.x / divisor, 0f);
         bgMaterial.mainTextureOffset = newOffset;
     }
 }
