@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         if(Input.GetKey(KeyCode.Mouse1)) {
-            if(jetpackFuel.fuel > 0) {
+            if(jetpackFuel.Fuel > 0) {
                 usingJetpack = true;
                 animator.SetBool(isJumping, true);
             }
