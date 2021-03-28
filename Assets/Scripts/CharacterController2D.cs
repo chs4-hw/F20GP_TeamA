@@ -24,6 +24,8 @@ public class CharacterController2D : MonoBehaviour
 	private Vector3 m_Velocity = Vector3.zero;
 	private bool canJump = false;
 	private bool canDoubleJump = false;
+	private bool onWall = false;
+	private int wallJumpCounter = 0;
 
 	[Header("Events")]
 	[Space]
@@ -85,6 +87,17 @@ public class CharacterController2D : MonoBehaviour
 			canJump = true;
 			canDoubleJump = true;
         }
+
+		Physics2D.queriesStartInColliders = false;
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.right * transform.localScale.x, 2.0f);
+		if (hit.collider != null)
+		{
+			onWall = true;
+		}
+		else
+		{
+			onWall = false;
+		}
 	}
 
 
@@ -150,9 +163,30 @@ public class CharacterController2D : MonoBehaviour
 				Flip();
 			}
 		}
+		//wall jumping, mainly for sticky situations, limited to two jumps
+		if (!m_Grounded && jump)
+		{
+			
+			if (onWall && wallJumpCounter != 2)
+			{
+				float x = 2.0f;
+				if (m_FacingRight)
+				{
+					x = -2.0f;
+				}
+				else
+				{
+					x = 2.0f;
+				}
+				m_Rigidbody2D.velocity = new Vector2(x, 1f) * m_JumpForce;
+				wallJumpCounter += 1;
+				Flip();
+			}
+
+		}
 
 		// Jetpack-ing.
-		if(usingJetpack) {
+		if (usingJetpack) {
 			m_Grounded = false;
 			canJump = false;
 			canDoubleJump = false;
@@ -180,6 +214,7 @@ public class CharacterController2D : MonoBehaviour
 			m_Grounded = false;
 			m_Rigidbody2D.velocity = Vector2.up * m_JumpForce;
 			canJump = false;
+			wallJumpCounter = 0;
 		}
 		else if(jump && canDoubleJump) {
             // Add a vertical force to the player.
@@ -187,6 +222,7 @@ public class CharacterController2D : MonoBehaviour
             m_Rigidbody2D.velocity = Vector2.up * m_JumpForce;
             canDoubleJump = false;
         }
+		
 	}
 
 
