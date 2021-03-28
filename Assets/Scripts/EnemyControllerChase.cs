@@ -23,6 +23,7 @@ public class EnemyControllerChase : MonoBehaviour
             if (hitPlayerL.collider.gameObject.tag == "Player")
             {
                 rb.AddForce(new Vector3(-30.0f, 0.0f, 0.0f), ForceMode2D.Force);
+                transform.localRotation = Quaternion.Euler(0, 0, 0);
             }
         }
         RaycastHit2D hitPlayerR = Physics2D.Raycast(transform.position, Vector2.right, 50.0f);
@@ -31,6 +32,7 @@ public class EnemyControllerChase : MonoBehaviour
             if (hitPlayerR.collider.gameObject.tag == "Player")
             {
                 rb.AddForce(new Vector3(30.0f, 0.0f, 0.0f), ForceMode2D.Force);
+                transform.localRotation = Quaternion.Euler(0, 180, 0);
             }
         }
 

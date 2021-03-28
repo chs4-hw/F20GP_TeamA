@@ -6,7 +6,7 @@ public class EnemyControllerPatrol : MonoBehaviour
 {
     private bool closeToWallRight = false;
     private bool closeToWallLeft = false;
-    private float forward = 10.0f;
+    private float forward = -10.0f;
     public Rigidbody2D rb;
     // Start is called before the first frame update
     void Start()
@@ -19,11 +19,13 @@ public class EnemyControllerPatrol : MonoBehaviour
         if (closeToWallRight)
         {
             forward = -10.0f;
+            transform.localRotation = Quaternion.Euler(0, 0, 0);
         }
 
         if (closeToWallLeft)
         {
             forward = 10.0f;
+            transform.localRotation = Quaternion.Euler(0, 180, 0);
         }
 
         Physics2D.queriesStartInColliders = false;
