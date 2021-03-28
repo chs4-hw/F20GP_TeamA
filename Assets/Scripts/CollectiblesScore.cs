@@ -13,7 +13,6 @@ public class CollectiblesScore : MonoBehaviour
     void Start()
     {
         startCrystals = GameObject.FindGameObjectsWithTag("Crystal").Length;
-        Debug.Log("awdawdawd" + startCrystals);
     }
 
     // Update is called once per frame
