@@ -50,19 +50,9 @@ public class CharacterController2D : MonoBehaviour
 	}
 
     void Update() {
-        if(canJump) {
-            singleJump.transform.localScale = new Vector3(1,1,1);
-        }
-        else {
-            singleJump.transform.localScale = new Vector3(0,0,0);
-        }
-
-        if(canDoubleJump) {
-            doubleJump.transform.localScale = new Vector3(1, 1, 1);
-        }
-        else {
-            doubleJump.transform.localScale = new Vector3(0, 0, 0);
-        }
+		// Show or hide UI elements indicating jump availability.
+		singleJump.transform.localScale = canJump ? new Vector3(1,1,1) : new Vector3(0,0,0);
+		doubleJump.transform.localScale = canDoubleJump ? new Vector3(1,1,1) : new Vector3(0,0,0);
     }
 
 	private void FixedUpdate()

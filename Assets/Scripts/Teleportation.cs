@@ -4,27 +4,34 @@ using UnityEngine;
 
 public class Teleportation : MonoBehaviour
 {
-    public GameObject Portal;
+    public GameObject outPortal;
     public GameObject Player;
+    public bool justActivated = false;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    private float playerVerticalOffset = 2.50f;
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Player")
         {
-            StartCoroutine(Teleport());
-            
+            //StartCoroutine(Teleport());
+
+            if(!justActivated) {
+                try {
+                    outPortal.GetComponent<Teleportation>().justActivated = true;
+                }
+                catch {
+                    // Then do nothing as 'outPortal' is just an exit point.
+                }
+                
+                Player.transform.position = new Vector2(outPortal.transform.position.x, outPortal.transform.position.y - playerVerticalOffset);
+            }
+        }
+    }
+
+    public void OnTriggerExit2D(Collider2D collision) {
+        if (collision.gameObject.tag == "Player") {
+            justActivated = false;
         }
     }
 
@@ -32,6 +39,6 @@ public class Teleportation : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
 
-        Player.transform.position = new Vector2(Portal.transform.position.x, Portal.transform.position.y);
+        Player.transform.position = new Vector2(outPortal.transform.position.x, outPortal.transform.position.y);
     }
 }
